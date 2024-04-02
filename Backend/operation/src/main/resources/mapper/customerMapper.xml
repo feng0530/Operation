@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tw.idv.frank.customer.model.mapper.CustomerMapper">
+
+    <resultMap id="CustomerResultMap" type="tw.idv.frank.customer.model.entity.Customer">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="location" property="location" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getCustomerList" resultMap="CustomerResultMap">
+        SELECT * FROM customer WHERE 1=1
+        <if test="id != null and id != ''">
+            AND id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="phone != null and phone != ''">
+            AND phone LIKE CONCAT('%', #{phone}, '%')
+        </if>
+        <if test="location != null and location != ''">
+            AND location LIKE CONCAT('%', #{location}, '%')
+        </if>
+        ORDER BY id
+    </select>
+
+    <delete id="deleteCustomers">
+        DELETE FROM customer
+        <trim prefix="WHERE" suffixOverrides="AND">
+            <if test="id != null and id != ''">
+                id = #{id} AND
+            </if>
+            <if test="name != null and name != ''">
+                name LIKE CONCAT('%', #{name}, '%') AND
+            </if>
+            <if test="phone != null and phone != ''">
+                phone LIKE CONCAT('%', #{phone}, '%') AND
+            </if>
+            <if test="location != null and location != ''">
+                location LIKE CONCAT('%', #{location}, '%') AND
+            </if>
+        </trim>
+    </delete>
+
+    <update id="updateCustomers">
+        UPDATE customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="location != null and location != ''">
+                location = #{location},
+            </if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+
+</mapper>
