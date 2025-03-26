@@ -1,0 +1,65 @@
+services:
+  db:
+    build:
+      context: ./
+      dockerfile: Database
+    image: postgres:Operation
+    container_name: Postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - "Postgres_bk:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 2
+      start_period: 10s
+      start_interval: 1s
+    restart: always
+  
+  backend:
+    build:
+      context: ./
+      dockerfile: Backend
+    image: backend:Operation
+    container_name: Backend
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_IP=Postgresql
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/Operation/health || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
+      start_interval: 1s
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: Nginx
+    image: frontend:Operation
+    container_name: Frontend
+    ports:
+      - 8081:80
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:80 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
+      start_interval: 1s
+
+
+volumes:
+  Postgres_bk:
+    name: Postgres_bk
+    external: false
+  

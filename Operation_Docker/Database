@@ -1,0 +1,10 @@
+FROM postgres:16.4
+
+COPY ./bk.sql /docker-entrypoint-initdb.d
+
+EXPOSE 5432
+
+# WORKDIR /
+# HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=2 \
+# CMD [ "pg_isready", "-U", "postgres"] \
+# || exit 1
